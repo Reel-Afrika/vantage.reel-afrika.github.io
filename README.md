@@ -1,2 +1,2 @@
-# vantage.reel-africa.github.io
+# Vantage Public Site
 An analysis system for automated market data aggregation
