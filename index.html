@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vantage — AI-Powered Financial Analysis Platform</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1c2128;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #2f81f7;
+      --accent2: #3fb950;
+      --accent3: #d2a8ff;
+      --accent4: #ffa657;
+      --tag-bg: #1f3050;
+      --tag-text: #79c0ff;
+      --rust: #ff6b35;
+      --python: #4b8bbf;
+      --ts: #3178c6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ─── Nav ───────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .nav-brand {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .nav-brand span { color: var(--accent); }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    nav ul a {
+      color: var(--muted);
+      font-size: 0.875rem;
+      transition: color 0.15s;
+    }
+
+    nav ul a:hover { color: var(--text); text-decoration: none; }
+
+    /* ─── Hero ──────────────────────────────────────────────── */
+    .hero {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 5rem 2rem 3.5rem;
+      text-align: center;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.65rem;
+      border-radius: 2rem;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--muted);
+    }
+
+    .badge.green { border-color: #3fb95060; color: var(--accent2); background: #0d210d; }
+    .badge.blue  { border-color: #2f81f760; color: var(--accent);  background: #0d1a30; }
+    .badge.purple { border-color: #d2a8ff60; color: var(--accent3); background: #1a0d2e; }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+      background: linear-gradient(135deg, #e6edf3 0%, #8b949e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto 2rem;
+    }
+
+    /* ─── Layout ────────────────────────────────────────────── */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    section {
+      padding: 3.5rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      letter-spacing: -0.3px;
+    }
+
+    p { color: var(--muted); margin-bottom: 1rem; }
+
+    /* ─── Stack grid ────────────────────────────────────────── */
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .stack-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .stack-card:hover { border-color: var(--accent); }
+
+    .stack-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .lang-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .lang-dot.rust   { background: var(--rust); }
+    .lang-dot.python { background: var(--python); }
+    .lang-dot.ts     { background: var(--ts); }
+    .lang-dot.any    { background: var(--accent2); }
+
+    .stack-card h3 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .stack-card p {
+      font-size: 0.825rem;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* ─── Architecture diagram ──────────────────────────────── */
+    .arch-diagram {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-top: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .arch-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .arch-layer {
+      display: flex;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+
+    .arch-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      width: 100px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      padding-top: 0.1rem;
+    }
+
+    .arch-boxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      flex: 1;
+    }
+
+    .arch-box {
+      border-radius: 5px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    .arch-box.rust   { background: #1a0c06; border-color: #ff6b3560; color: var(--rust); }
+    .arch-box.python { background: #0c1420; border-color: #4b8bbf60; color: #79b8ff; }
+    .arch-box.ts     { background: #0c1020; border-color: #3178c660; color: #88c0ff; }
+    .arch-box.neutral { background: var(--bg3); border-color: var(--border); color: var(--muted); }
+
+    .arch-arrow {
+      display: flex;
+      align-items: center;
+      padding-left: 100px;
+      gap: 0;
+    }
+
+    .arch-arrow-line {
+      font-size: 0.75rem;
+      color: var(--border);
+    }
+
+    /* ─── Features grid ─────────────────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .feature-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .feature-icon {
+      font-size: 1.4rem;
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+    }
+
+    .feature-card p {
+      font-size: 0.825rem;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* ─── Quality metrics ───────────────────────────────────── */
+    .metrics-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .metric-card {
+      flex: 1 1 160px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+    }
+
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--accent2);
+      display: block;
+    }
+
+    .metric-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: block;
+      margin-top: 0.15rem;
+    }
+
+    /* ─── Code snippet ──────────────────────────────────────── */
+    .code-block {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin-top: 1rem;
+      color: #e6edf3;
+    }
+
+    .code-comment { color: #6e7681; }
+    .code-keyword { color: #ff7b72; }
+    .code-string  { color: #a5d6ff; }
+    .code-type    { color: #ffa657; }
+    .code-fn      { color: #d2a8ff; }
+    .code-num     { color: #79c0ff; }
+
+    /* ─── Footer ────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      nav ul { display: none; }
+      .arch-label { display: none; }
+      .arch-arrow { padding-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Nav ──────────────────────────────────────────────────── -->
+<nav>
+  <span class="nav-brand">vantage<span>.</span></span>
+  <ul>
+    <li><a href="#stack">Stack</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#highlights">Highlights</a></li>
+    <li><a href="#quality">Quality</a></li>
+  </ul>
+</nav>
+
+<!-- ─── Hero ─────────────────────────────────────────────────── -->
+<div class="hero">
+  <div class="badge-row">
+    <span class="badge blue">Python 3.14</span>
+    <span class="badge">Rust</span>
+    <span class="badge">TypeScript</span>
+    <span class="badge">Tauri 2</span>
+    <span class="badge">DuckDB</span>
+    <span class="badge purple">Claude API</span>
+    <span class="badge">LlamaIndex</span>
+    <span class="badge">FastAPI</span>
+    <span class="badge green">99.7% coverage</span>
+  </div>
+
+  <h1>AI-Powered Financial<br/>Analysis Platform</h1>
+
+  <p class="hero-sub">
+    A multi-language system for automated market data aggregation, domain-grounded
+    investment research, and structured analysis delivery — built with Python, Rust,
+    and TypeScript in a native desktop shell.
+  </p>
+</div>
+
+<!-- ─── Stack ────────────────────────────────────────────────── -->
+<div class="container">
+<section id="stack">
+  <div class="section-label">Technology</div>
+  <h2>Three-language architecture</h2>
+  <p>
+    Each language handles what it does best: Python for AI orchestration and data
+    collection, Rust for high-throughput numerical computation, and TypeScript for
+    a reactive UI — all connected through a shared DuckDB file and HTTP boundary.
+  </p>
+
+  <div class="stack-grid">
+
+    <div class="stack-card">
+      <div class="stack-card-header">
+        <div class="lang-dot python"></div>
+        <h3>Python AI Microservice</h3>
+      </div>
+      <p>FastAPI server handling data ingestion from yfinance, SEC EDGAR XBRL API, FRED,
+        and RSS feeds. RAG pipeline via LlamaIndex + ChromaDB. Thesis generation through
+        the Anthropic Claude API. MCP server for chat-based access.</p>
+    </div>
+
+    <div class="stack-card">
+      <div class="stack-card-header">
+        <div class="lang-dot rust"></div>
+        <h3>Rust Backend (Tauri)</h3>
+      </div>
+      <p>Valuation engines (EPV, DCF, multiples, composite), quantitative screening
+        pipelines, DuckDB read/write with file-level write-lock, tokio async runtime,
+        and a cron scheduler for automated batch runs.</p>
+    </div>
+
+    <div class="stack-card">
+      <div class="stack-card-header">
+        <div class="lang-dot ts"></div>
+        <h3>TypeScript Frontend</h3>
+      </div>
+      <p>Frameworkless TypeScript bundled into Tauri's native WebView. uPlot for
+        zero-dependency OHLCV charts. IPC via <code>tauri::command</code> — no
+        separate server process, no Electron overhead (~5 MB install vs ~200 MB).</p>
+    </div>
+
+    <div class="stack-card">
+      <div class="stack-card-header">
+        <div class="lang-dot any"></div>
+        <h3>DuckDB (shared layer)</h3>
+      </div>
+      <p>Single analytical database accessed by both Rust and Python. Columnar storage
+        for screening across large ticker universes. File-level write lock prevents
+        concurrent write conflicts. Serves as TTL cache, time-series store, and
+        structured result archive.</p>
+    </div>
+
+    <div class="stack-card">
+      <div class="stack-card-header">
+        <div class="lang-dot python"></div>
+        <h3>RAG Knowledge Pipeline</h3>
+      </div>
+      <p>Ingests domain documents (PDFs, markdown notes) into ChromaDB via
+        LlamaIndex. Local embeddings with <code>all-MiniLM-L6-v2</code> — no per-query
+        API cost. Incremental re-ingestion via mtime manifest. Cited passages injected
+        into Claude prompts.</p>
+    </div>
+
+    <div class="stack-card">
+      <div class="stack-card-header">
+        <div class="lang-dot any"></div>
+        <h3>Data Sources</h3>
+      </div>
+      <p>Live market data (yfinance), structured multi-year financials via SEC EDGAR
+        XBRL REST API (no key required), macro series from FRED via fredapi, and
+        ticker-level news via Yahoo Finance RSS — all with configurable TTL caching.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── Architecture ─────────────────────────────────────────── -->
+<section id="architecture">
+  <div class="section-label">Design</div>
+  <h2>System architecture</h2>
+  <p>
+    The desktop app and Python microservice communicate over localhost HTTP.
+    DuckDB is the single source of truth — Rust reads market data written by Python
+    and writes screening results back for the frontend to display.
+  </p>
+
+  <div class="arch-diagram">
+    <div class="arch-layers">
+
+      <div class="arch-layer">
+        <span class="arch-label">Frontend</span>
+        <div class="arch-boxes">
+          <span class="arch-box ts">Dashboard</span>
+          <span class="arch-box ts">Screening Results</span>
+          <span class="arch-box ts">Analysis Viewer</span>
+          <span class="arch-box ts">Watchlist</span>
+          <span class="arch-box ts">uPlot Charts</span>
+        </div>
+      </div>
+
+      <div class="arch-arrow">
+        <span class="arch-arrow-line">↕ tauri::command (IPC)</span>
+      </div>
+
+      <div class="arch-layer">
+        <span class="arch-label">Rust Backend</span>
+        <div class="arch-boxes">
+          <span class="arch-box rust">EPV Engine</span>
+          <span class="arch-box rust">DCF Engine</span>
+          <span class="arch-box rust">Multiples Engine</span>
+          <span class="arch-box rust">Value Screener</span>
+          <span class="arch-box rust">Growth Screener</span>
+          <span class="arch-box rust">Cron Scheduler</span>
+          <span class="arch-box rust">DuckDB Layer</span>
+        </div>
+      </div>
+
+      <div class="arch-arrow">
+        <span class="arch-arrow-line">↕ HTTP localhost:8000 (reqwest) &nbsp;&nbsp;|&nbsp;&nbsp; ↕ shared DuckDB file</span>
+      </div>
+
+      <div class="arch-layer">
+        <span class="arch-label">Python Service</span>
+        <div class="arch-boxes">
+          <span class="arch-box python">FastAPI</span>
+          <span class="arch-box python">yfinance</span>
+          <span class="arch-box python">SEC EDGAR</span>
+          <span class="arch-box python">FRED (fredapi)</span>
+          <span class="arch-box python">News (RSS)</span>
+          <span class="arch-box python">LlamaIndex RAG</span>
+          <span class="arch-box python">Claude API</span>
+          <span class="arch-box python">MCP Server</span>
+        </div>
+      </div>
+
+      <div class="arch-arrow">
+        <span class="arch-arrow-line">↕ TTL-cached read/write</span>
+      </div>
+
+      <div class="arch-layer">
+        <span class="arch-label">Persistence</span>
+        <div class="arch-boxes">
+          <span class="arch-box neutral">DuckDB (market data, results, cache, logs)</span>
+          <span class="arch-box neutral">ChromaDB (vector embeddings)</span>
+          <span class="arch-box neutral">Vault (markdown output)</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── Highlights ────────────────────────────────────────────── -->
+<section id="highlights">
+  <div class="section-label">Engineering</div>
+  <h2>Key highlights</h2>
+  <p>
+    Selected design decisions worth calling out.
+  </p>
+
+  <div class="features-grid">
+
+    <div class="feature-card">
+      <span class="feature-icon">🏗️</span>
+      <h3>Schema-driven ORM (zero raw SQL)</h3>
+      <p>Pydantic <code>BaseModel</code> subclasses generate all DDL and DML from
+        field annotations — column names, types, nullability, defaults, and UNIQUE
+        constraints. No hardcoded SQL strings outside the model layer.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🔒</span>
+      <h3>File-level write lock</h3>
+      <p>DuckDB is shared between Rust and Python. A <code>.lock</code> file held
+        for each write transaction prevents simultaneous writes without blocking
+        concurrent reads from either process.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🧠</span>
+      <h3>Cited RAG → structured prompts</h3>
+      <p>Domain PDFs and notes are chunked, embedded locally (no API cost), and
+        stored in ChromaDB. 3–5 targeted queries per analysis inject cited passages
+        directly into Claude prompts — grounding output in source material.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">⚡</span>
+      <h3>Rust valuation engines</h3>
+      <p>EPV (Greenwald), DCF with sensitivity tables (Damodaran), peer multiples
+        comparison, and composite bear/base/bull ranges — implemented as pure Rust
+        with full intermediate value output for auditability.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">📡</span>
+      <h3>Multi-source data with TTL cache</h3>
+      <p>Prices, fundamentals, macro series, SEC filings, and news each have
+        independent TTL policies (4 h → 7 d). Cache misses fetch live; hits return
+        instantly from DuckDB — no repeated API calls within a session.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🖥️</span>
+      <h3>Native desktop via Tauri 2</h3>
+      <p>Tauri wraps the TypeScript UI in the OS WebView — no bundled Chromium.
+        macOS install is ~5 MB vs ~200 MB for an equivalent Electron app. IPC
+        is type-safe via <code>tauri::command</code> with serde serialization.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🤖</span>
+      <h3>MCP integration (Claude Code)</h3>
+      <p>FastMCP server exposes platform capabilities as MCP tools — generate analysis,
+        query the knowledge base, manage the watchlist, and trigger reports — all
+        callable from Claude Code chat via stdio transport.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">📅</span>
+      <h3>Automated batch pipeline</h3>
+      <p>tokio-cron-scheduler fires a weekly batch job: Rust scheduler → Python data
+        fetch → Rust screening + valuation → Python thesis generation → structured
+        markdown report written to the Obsidian vault.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">📊</span>
+      <h3>SEC EDGAR XBRL REST API</h3>
+      <p>Structured multi-year financial statements pulled from
+        <code>data.sec.gov/api/xbrl/companyfacts/</code> — no third-party data
+        subscription required. CIK lookup, 10-K/10-Q text extraction, and 7-day
+        cache via DuckDB.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── Quality ───────────────────────────────────────────────── -->
+<section id="quality">
+  <div class="section-label">Code Quality</div>
+  <h2>Engineering standards</h2>
+  <p>
+    The Python microservice is developed test-first with strict static analysis.
+    CI runs on every push via GitHub Actions.
+  </p>
+
+  <div class="metrics-row">
+    <div class="metric-card">
+      <span class="metric-value">100%</span>
+      <span class="metric-label">test coverage</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-value">250+</span>
+      <span class="metric-label">pytest tests</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-value">0</span>
+      <span class="metric-label">mypy errors (strict)</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-value">0</span>
+      <span class="metric-label">ruff warnings</span>
+    </div>
+  </div>
+
+  <p style="margin-top: 1.5rem;">
+    Every module has a corresponding test file. Fixtures are shared via
+    <code>conftest.py</code>. External APIs (yfinance, FRED, feedparser, Anthropic)
+    are mocked at the boundary — no network calls in CI. Pydantic models enforce
+    types at runtime; mypy enforces them statically.
+  </p>
+
+  <div class="code-block"><span class="code-comment"># Schema-driven DDL — no hardcoded SQL, generated from model_fields</span>
+<span class="code-keyword">class</span> <span class="code-type">MarketData</span>(TableModel):
+    ticker:     <span class="code-type">str</span>
+    data_type:  <span class="code-type">str</span>
+    data:       <span class="code-type">dict</span>[<span class="code-type">str</span>, <span class="code-type">object</span>]
+    fetched_at: <span class="code-type">datetime</span>  = <span class="code-type">Field</span>(default_factory=datetime.utcnow,
+                                       json_schema_extra=<span class="code-type">DuckMeta</span>(default=<span class="code-string">"now()"</span>).as_extra())
+    _natural_key = (<span class="code-string">"ticker"</span>, <span class="code-string">"data_type"</span>)
+
+<span class="code-comment"># Generates: CREATE TABLE IF NOT EXISTS market_data (</span>
+<span class="code-comment">#   id UUID NOT NULL DEFAULT gen_random_uuid(),</span>
+<span class="code-comment">#   ticker VARCHAR NOT NULL,</span>
+<span class="code-comment">#   data_type VARCHAR NOT NULL,</span>
+<span class="code-comment">#   data JSON NOT NULL,</span>
+<span class="code-comment">#   fetched_at TIMESTAMP NOT NULL DEFAULT now(),</span>
+<span class="code-comment">#   PRIMARY KEY (id), UNIQUE (ticker, data_type)</span>
+<span class="code-comment"># )</span></div>
+
+  <p style="margin-top: 1.5rem;">
+    CI pipeline: <strong>ruff</strong> (lint + format) → <strong>mypy</strong> (strict type check)
+    → <strong>pytest</strong> (249 tests) → <strong>coverage</strong> upload to Codecov.
+    All checks are required to pass before merge.
+  </p>
+</section>
+</div>
+
+<!-- ─── Footer ────────────────────────────────────────────────── -->
+<footer>
+  <p>Vantage &mdash; private project &mdash; built with Python 3.14 · Rust · TypeScript · Tauri 2 · DuckDB · Claude API</p>
+</footer>
+
+</body>
+</html>
