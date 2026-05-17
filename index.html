@@ -100,8 +100,8 @@
       color: var(--muted);
     }
 
-    .badge.green { border-color: #3fb95060; color: var(--accent2); background: #0d210d; }
-    .badge.blue  { border-color: #2f81f760; color: var(--accent);  background: #0d1a30; }
+    .badge.green  { border-color: #3fb95060; color: var(--accent2); background: #0d210d; }
+    .badge.blue   { border-color: #2f81f760; color: var(--accent);  background: #0d1a30; }
     .badge.purple { border-color: #d2a8ff60; color: var(--accent3); background: #1a0d2e; }
 
     h1 {
@@ -253,9 +253,9 @@
       border: 1px solid;
     }
 
-    .arch-box.rust   { background: #1a0c06; border-color: #ff6b3560; color: var(--rust); }
-    .arch-box.python { background: #0c1420; border-color: #4b8bbf60; color: #79b8ff; }
-    .arch-box.ts     { background: #0c1020; border-color: #3178c660; color: #88c0ff; }
+    .arch-box.rust    { background: #1a0c06; border-color: #ff6b3560; color: var(--rust); }
+    .arch-box.python  { background: #0c1420; border-color: #4b8bbf60; color: #79b8ff; }
+    .arch-box.ts      { background: #0c1020; border-color: #3178c660; color: #88c0ff; }
     .arch-box.neutral { background: var(--bg3); border-color: var(--border); color: var(--muted); }
 
     .arch-arrow {
@@ -268,6 +268,45 @@
     .arch-arrow-line {
       font-size: 0.75rem;
       color: var(--border);
+    }
+
+    /* ─── Pipeline funnel ───────────────────────────────────── */
+    .pipeline-funnel {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 1.5rem;
+    }
+
+    .funnel-step {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem 1.2rem;
+      text-align: center;
+      flex: 1 1 110px;
+    }
+
+    .funnel-step-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent2);
+      letter-spacing: -0.5px;
+      display: block;
+    }
+
+    .funnel-step-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      display: block;
+      margin-top: 0.1rem;
+    }
+
+    .funnel-arrow {
+      color: var(--border);
+      font-size: 1.2rem;
+      flex-shrink: 0;
     }
 
     /* ─── Features grid ─────────────────────────────────────── */
@@ -372,6 +411,7 @@
       nav ul { display: none; }
       .arch-label { display: none; }
       .arch-arrow { padding-left: 0; }
+      .funnel-arrow { display: none; }
     }
   </style>
 </head>
@@ -382,6 +422,7 @@
   <span class="nav-brand">vantage<span>.</span></span>
   <ul>
     <li><a href="#stack">Stack</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
     <li><a href="#architecture">Architecture</a></li>
     <li><a href="#highlights">Highlights</a></li>
     <li><a href="#quality">Quality</a></li>
@@ -399,7 +440,8 @@
     <span class="badge purple">Claude API</span>
     <span class="badge">LlamaIndex</span>
     <span class="badge">FastAPI</span>
-    <span class="badge green">99.7% coverage</span>
+    <span class="badge">matplotlib</span>
+    <span class="badge green">1,000+ tests</span>
   </div>
 
   <h1>AI-Powered Financial<br/>Analysis Platform</h1>
@@ -429,9 +471,10 @@
         <div class="lang-dot python"></div>
         <h3>Python AI Microservice</h3>
       </div>
-      <p>FastAPI server handling data ingestion from yfinance, SEC EDGAR XBRL API, FRED,
-        and RSS feeds. RAG pipeline via LlamaIndex + ChromaDB. Thesis generation through
-        the Anthropic Claude API. MCP server for chat-based access.</p>
+      <p>FastAPI server handling data ingestion from yfinance, SEC EDGAR XBRL API,
+        and FRED. RAG pipeline via LlamaIndex + ChromaDB. Thesis generation and
+        weekly report narrative via the Anthropic Claude API. MCP server with 21
+        tools for chat-based access.</p>
     </div>
 
     <div class="stack-card">
@@ -439,7 +482,7 @@
         <div class="lang-dot rust"></div>
         <h3>Rust Backend (Tauri)</h3>
       </div>
-      <p>Valuation engines (EPV, DCF, multiples, composite), quantitative screening
+      <p>Valuation engines (EPV, multiples, composite), quantitative screening
         pipelines, DuckDB read/write with file-level write-lock, tokio async runtime,
         and a cron scheduler for automated batch runs.</p>
     </div>
@@ -450,8 +493,9 @@
         <h3>TypeScript Frontend</h3>
       </div>
       <p>Frameworkless TypeScript bundled into Tauri's native WebView. uPlot for
-        zero-dependency OHLCV charts. IPC via <code>tauri::command</code> — no
-        separate server process, no Electron overhead (~5 MB install vs ~200 MB).</p>
+        zero-dependency OHLCV and valuation-multiples charts. Accordion candidate
+        panels with radar charts. IPC via <code>tauri::command</code> — no separate
+        server process, no Electron overhead (~5 MB vs ~200 MB).</p>
     </div>
 
     <div class="stack-card">
@@ -460,9 +504,9 @@
         <h3>DuckDB (shared layer)</h3>
       </div>
       <p>Single analytical database accessed by both Rust and Python. Columnar storage
-        for screening across large ticker universes. File-level write lock prevents
-        concurrent write conflicts. Serves as TTL cache, time-series store, and
-        structured result archive.</p>
+        for screening across the full S&amp;P 500 universe. File-level write lock
+        prevents concurrent write conflicts. Serves as TTL cache, time-series store,
+        and structured result archive.</p>
     </div>
 
     <div class="stack-card">
@@ -478,15 +522,72 @@
 
     <div class="stack-card">
       <div class="stack-card-header">
+        <div class="lang-dot python"></div>
+        <h3>Static Chart Generation</h3>
+      </div>
+      <p>matplotlib produces three PNGs per thesis at zero token cost: 5-year
+        revenue &amp; earnings bar chart (EDGAR XBRL), 1-year price vs 200d MA line
+        chart (yfinance), and valuation multiples vs 5-year historical average.
+        Images are embedded directly in Obsidian markdown.</p>
+    </div>
+
+    <div class="stack-card">
+      <div class="stack-card-header">
         <div class="lang-dot any"></div>
         <h3>Data Sources</h3>
       </div>
       <p>Live market data (yfinance), structured multi-year financials via SEC EDGAR
-        XBRL REST API (no key required), macro series from FRED via fredapi, and
-        ticker-level news via Yahoo Finance RSS — all with configurable TTL caching.</p>
+        XBRL REST API (no key required), macro series from FRED via fredapi — all
+        with configurable TTL caching in DuckDB.</p>
     </div>
 
   </div>
+</section>
+
+<!-- ─── Pipeline ─────────────────────────────────────────────── -->
+<section id="pipeline">
+  <div class="section-label">Screening</div>
+  <h2>Three-tier pipeline</h2>
+  <p>
+    Every scheduled run works through three stages in sequence. The universe starts
+    from the current S&amp;P 500 constituent list (~500 tickers), refreshed monthly.
+    Each stage narrows the field and adds richer AI-generated context.
+  </p>
+
+  <div class="pipeline-funnel">
+    <div class="funnel-step">
+      <span class="funnel-step-value">~500</span>
+      <span class="funnel-step-label">Universe<br/>(S&amp;P 500)</span>
+    </div>
+    <span class="funnel-arrow">→</span>
+    <div class="funnel-step">
+      <span class="funnel-step-value">Screened</span>
+      <span class="funnel-step-label">All passing tickers<br/>scored &amp; ranked</span>
+    </div>
+    <span class="funnel-arrow">→</span>
+    <div class="funnel-step">
+      <span class="funnel-step-value">20</span>
+      <span class="funnel-step-label">Candidates<br/>(10 Growth + 10 Value)</span>
+    </div>
+    <span class="funnel-arrow">→</span>
+    <div class="funnel-step">
+      <span class="funnel-step-value">10</span>
+      <span class="funnel-step-label">Theses<br/>(5 Growth + 5 Value)</span>
+    </div>
+    <span class="funnel-arrow">→</span>
+    <div class="funnel-step">
+      <span class="funnel-step-value">★</span>
+      <span class="funnel-step-label">Watchlist<br/>(user-curated)</span>
+    </div>
+  </div>
+
+  <p style="margin-top: 1.5rem;">
+    Screening criteria are seeded from predefined growth and value rule sets and
+    refined over time via a guided MCP questionnaire — plain-English questions about
+    risk tolerance and preferences, no JSON or finance jargon required. Theses older
+    than 14 days are flagged as stale in the Tauri UI; watchlist entries whose score
+    drops below threshold are flagged as "no longer qualifying."
+  </p>
 </section>
 
 <!-- ─── Architecture ─────────────────────────────────────────── -->
@@ -505,11 +606,13 @@
       <div class="arch-layer">
         <span class="arch-label">Frontend</span>
         <div class="arch-boxes">
-          <span class="arch-box ts">Dashboard</span>
-          <span class="arch-box ts">Screening Results</span>
-          <span class="arch-box ts">Analysis Viewer</span>
+          <span class="arch-box ts">Dashboard + Funnel</span>
+          <span class="arch-box ts">Candidates (accordion)</span>
+          <span class="arch-box ts">Thesis Viewer</span>
           <span class="arch-box ts">Watchlist</span>
+          <span class="arch-box ts">Weekly Reports</span>
           <span class="arch-box ts">uPlot Charts</span>
+          <span class="arch-box ts">Radar Charts</span>
         </div>
       </div>
 
@@ -521,7 +624,6 @@
         <span class="arch-label">Rust Backend</span>
         <div class="arch-boxes">
           <span class="arch-box rust">EPV Engine</span>
-          <span class="arch-box rust">DCF Engine</span>
           <span class="arch-box rust">Multiples Engine</span>
           <span class="arch-box rust">Value Screener</span>
           <span class="arch-box rust">Growth Screener</span>
@@ -537,14 +639,14 @@
       <div class="arch-layer">
         <span class="arch-label">Python Service</span>
         <div class="arch-boxes">
-          <span class="arch-box python">FastAPI</span>
+          <span class="arch-box python">FastAPI (18 endpoints)</span>
           <span class="arch-box python">yfinance</span>
           <span class="arch-box python">SEC EDGAR</span>
           <span class="arch-box python">FRED (fredapi)</span>
-          <span class="arch-box python">News (RSS)</span>
           <span class="arch-box python">LlamaIndex RAG</span>
           <span class="arch-box python">Claude API</span>
-          <span class="arch-box python">MCP Server</span>
+          <span class="arch-box python">matplotlib Charts</span>
+          <span class="arch-box python">MCP Server (21 tools)</span>
         </div>
       </div>
 
@@ -557,7 +659,7 @@
         <div class="arch-boxes">
           <span class="arch-box neutral">DuckDB (market data, results, cache, logs)</span>
           <span class="arch-box neutral">ChromaDB (vector embeddings)</span>
-          <span class="arch-box neutral">Vault (markdown output)</span>
+          <span class="arch-box neutral">Vault (markdown + PNG charts)</span>
         </div>
       </div>
 
@@ -602,17 +704,18 @@
     <div class="feature-card">
       <span class="feature-icon">⚡</span>
       <h3>Rust valuation engines</h3>
-      <p>EPV (Greenwald), DCF with sensitivity tables (Damodaran), peer multiples
-        comparison, and composite bear/base/bull ranges — implemented as pure Rust
-        with full intermediate value output for auditability.</p>
+      <p>EPV (Greenwald) and peer multiples comparison implemented as pure Rust
+        with full intermediate value output for auditability. Sector median P/E,
+        EV/EBITDA, P/FCF, and EV/S computed per ticker for premium/discount
+        positioning.</p>
     </div>
 
     <div class="feature-card">
       <span class="feature-icon">📡</span>
       <h3>Multi-source data with TTL cache</h3>
-      <p>Prices, fundamentals, macro series, SEC filings, and news each have
-        independent TTL policies (4 h → 7 d). Cache misses fetch live; hits return
-        instantly from DuckDB — no repeated API calls within a session.</p>
+      <p>Prices, fundamentals, macro series, and SEC filings each have independent
+        TTL policies (4 h → 7 d). Cache misses fetch live; hits return instantly
+        from DuckDB — no repeated API calls within a session.</p>
     </div>
 
     <div class="feature-card">
@@ -625,18 +728,20 @@
 
     <div class="feature-card">
       <span class="feature-icon">🤖</span>
-      <h3>MCP integration (Claude Code)</h3>
-      <p>FastMCP server exposes platform capabilities as MCP tools — generate analysis,
-        query the knowledge base, manage the watchlist, and trigger reports — all
+      <h3>MCP integration (21 tools)</h3>
+      <p>FastMCP server exposes 21 platform tools — generate analysis, manage the
+        universe, refine screening criteria via a plain-English questionnaire,
+        query the knowledge base, manage the watchlist, and trigger reports —
         callable from Claude Code chat via stdio transport.</p>
     </div>
 
     <div class="feature-card">
       <span class="feature-icon">📅</span>
       <h3>Automated batch pipeline</h3>
-      <p>tokio-cron-scheduler fires a weekly batch job: Rust scheduler → Python data
-        fetch → Rust screening + valuation → Python thesis generation → structured
-        markdown report written to the Obsidian vault.</p>
+      <p>tokio-cron-scheduler fires a weekly batch: Rust scheduler → Python data
+        fetch → Rust screening + valuation → Python candidate promotion → thesis
+        generation with embedded matplotlib charts → structured markdown report
+        written to the Obsidian vault.</p>
     </div>
 
     <div class="feature-card">
@@ -648,6 +753,33 @@
         cache via DuckDB.</p>
     </div>
 
+    <div class="feature-card">
+      <span class="feature-icon">🌐</span>
+      <h3>Dynamic S&amp;P 500 universe</h3>
+      <p>The screening universe is the current S&amp;P 500 constituent list fetched
+        from Wikipedia and upserted on demand — never a hardcoded ticker list.
+        Each company carries its GICS sector for colour-coded badges and filter
+        controls across the UI.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">⚠️</span>
+      <h3>Thesis &amp; watchlist freshness</h3>
+      <p>Theses older than 14 days are flagged stale (orange → red badge) in the
+        Tauri thesis viewer. Watchlist entries are re-scored each pipeline run;
+        any that fall below the qualifying threshold show a "no longer qualifies"
+        banner with a one-click remove.</p>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🎛️</span>
+      <h3>Guided criteria refinement</h3>
+      <p>MCP tools <code>refine_growth_criteria</code> and
+        <code>refine_value_criteria</code> ask 5 plain-English questions about risk
+        tolerance and investment preferences, then translate answers into updated
+        scoring rule weights — no JSON or finance jargon required.</p>
+    </div>
+
   </div>
 </section>
 
@@ -656,18 +788,22 @@
   <div class="section-label">Code Quality</div>
   <h2>Engineering standards</h2>
   <p>
-    The Python microservice is developed test-first with strict static analysis.
-    CI runs on every push via GitHub Actions.
+    Both the Python microservice and TypeScript frontend are developed test-first
+    with strict static analysis. CI runs on every push via GitHub Actions.
   </p>
 
   <div class="metrics-row">
     <div class="metric-card">
       <span class="metric-value">100%</span>
-      <span class="metric-label">test coverage</span>
+      <span class="metric-label">Python test coverage</span>
     </div>
     <div class="metric-card">
-      <span class="metric-value">250+</span>
+      <span class="metric-value">614+</span>
       <span class="metric-label">pytest tests</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-value">396</span>
+      <span class="metric-label">TypeScript tests</span>
     </div>
     <div class="metric-card">
       <span class="metric-value">0</span>
@@ -681,9 +817,10 @@
 
   <p style="margin-top: 1.5rem;">
     Every module has a corresponding test file. Fixtures are shared via
-    <code>conftest.py</code>. External APIs (yfinance, FRED, feedparser, Anthropic)
-    are mocked at the boundary — no network calls in CI. Pydantic models enforce
-    types at runtime; mypy enforces them statically.
+    <code>conftest.py</code>. External APIs (yfinance, FRED, Anthropic) are mocked
+    at the boundary — no network calls in CI. Pydantic models enforce types at
+    runtime; mypy enforces them statically. TypeScript is checked with
+    <code>tsc --noEmit</code> and tested with Vitest (jsdom environment).
   </p>
 
   <div class="code-block"><span class="code-comment"># Schema-driven DDL — no hardcoded SQL, generated from model_fields</span>
@@ -706,7 +843,7 @@
 
   <p style="margin-top: 1.5rem;">
     CI pipeline: <strong>ruff</strong> (lint + format) → <strong>mypy</strong> (strict type check)
-    → <strong>pytest</strong> (249 tests) → <strong>coverage</strong> upload to Codecov.
+    → <strong>pytest</strong> (614+ tests) → <strong>coverage</strong> upload to Codecov.
     All checks are required to pass before merge.
   </p>
 </section>
