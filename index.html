@@ -436,7 +436,7 @@
     <span class="badge">Rust</span>
     <span class="badge">TypeScript</span>
     <span class="badge">Tauri 2</span>
-    <span class="badge">DuckDB</span>
+    <span class="badge">PostgreSQL</span>
     <span class="badge purple">Claude API</span>
     <span class="badge">LlamaIndex</span>
     <span class="badge">FastAPI</span>
@@ -461,7 +461,7 @@
   <p>
     Each language handles what it does best: Python for AI orchestration and data
     collection, Rust for high-throughput numerical computation, and TypeScript for
-    a reactive UI — all connected through a shared DuckDB file and HTTP boundary.
+    a reactive UI — all connected through a shared PostgreSQL database and HTTP boundary.
   </p>
 
   <div class="stack-grid">
@@ -471,9 +471,9 @@
         <div class="lang-dot python"></div>
         <h3>Python AI Microservice</h3>
       </div>
-      <p>FastAPI server handling data ingestion from yfinance, SEC EDGAR XBRL API,
-        and FRED. RAG pipeline via LlamaIndex + ChromaDB. Thesis generation and
-        weekly report narrative via the Anthropic Claude API. MCP server with 21
+      <p>FastAPI server handling data ingestion from yfinance and the SEC EDGAR
+        XBRL API. RAG pipeline via LlamaIndex + ChromaDB. Thesis generation and
+        weekly report narrative via the Anthropic Claude API. MCP server with 17
         tools for chat-based access.</p>
     </div>
 
@@ -483,7 +483,7 @@
         <h3>Rust Backend (Tauri)</h3>
       </div>
       <p>Valuation engines (EPV, multiples, composite), quantitative screening
-        pipelines, DuckDB read/write with file-level write-lock, tokio async runtime,
+        pipelines, PostgreSQL read/write via sqlx, tokio async runtime,
         and a cron scheduler for automated batch runs.</p>
     </div>
 
@@ -501,11 +501,11 @@
     <div class="stack-card">
       <div class="stack-card-header">
         <div class="lang-dot any"></div>
-        <h3>DuckDB (shared layer)</h3>
+        <h3>PostgreSQL (shared layer)</h3>
       </div>
-      <p>Single analytical database accessed by both Rust and Python. Columnar storage
-        for screening across the full S&amp;P 500 universe. File-level write lock
-        prevents concurrent write conflicts. Serves as TTL cache, time-series store,
+      <p>Single relational database accessed by both Rust (sqlx) and Python (psycopg).
+        Stores the full S&amp;P 500 screening universe. MVCC handles concurrent reads
+        and writes without file locks. Serves as TTL cache, time-series store,
         and structured result archive.</p>
     </div>
 
@@ -536,9 +536,9 @@
         <div class="lang-dot any"></div>
         <h3>Data Sources</h3>
       </div>
-      <p>Live market data (yfinance), structured multi-year financials via SEC EDGAR
-        XBRL REST API (no key required), macro series from FRED via fredapi — all
-        with configurable TTL caching in DuckDB.</p>
+      <p>Live market data (yfinance) and structured multi-year financials via SEC
+        EDGAR XBRL REST API (no key required) — all
+        with configurable TTL caching in PostgreSQL.</p>
     </div>
 
   </div>
@@ -596,7 +596,7 @@
   <h2>System architecture</h2>
   <p>
     The desktop app and Python microservice communicate over localhost HTTP.
-    DuckDB is the single source of truth — Rust reads market data written by Python
+    PostgreSQL is the single source of truth — Rust reads market data written by Python
     and writes screening results back for the frontend to display.
   </p>
 
@@ -628,25 +628,24 @@
           <span class="arch-box rust">Value Screener</span>
           <span class="arch-box rust">Growth Screener</span>
           <span class="arch-box rust">Cron Scheduler</span>
-          <span class="arch-box rust">DuckDB Layer</span>
+          <span class="arch-box rust">PostgreSQL (sqlx)</span>
         </div>
       </div>
 
       <div class="arch-arrow">
-        <span class="arch-arrow-line">↕ HTTP localhost:8000 (reqwest) &nbsp;&nbsp;|&nbsp;&nbsp; ↕ shared DuckDB file</span>
+        <span class="arch-arrow-line">↕ HTTP localhost:8000 (reqwest) &nbsp;&nbsp;|&nbsp;&nbsp; ↕ shared PostgreSQL database</span>
       </div>
 
       <div class="arch-layer">
         <span class="arch-label">Python Service</span>
         <div class="arch-boxes">
-          <span class="arch-box python">FastAPI (18 endpoints)</span>
+          <span class="arch-box python">FastAPI (17 endpoints)</span>
           <span class="arch-box python">yfinance</span>
           <span class="arch-box python">SEC EDGAR</span>
-          <span class="arch-box python">FRED (fredapi)</span>
           <span class="arch-box python">LlamaIndex RAG</span>
           <span class="arch-box python">Claude API</span>
           <span class="arch-box python">matplotlib Charts</span>
-          <span class="arch-box python">MCP Server (21 tools)</span>
+          <span class="arch-box python">MCP Server (17 tools)</span>
         </div>
       </div>
 
@@ -657,7 +656,7 @@
       <div class="arch-layer">
         <span class="arch-label">Persistence</span>
         <div class="arch-boxes">
-          <span class="arch-box neutral">DuckDB (market data, results, cache, logs)</span>
+          <span class="arch-box neutral">PostgreSQL (market data, results, cache, logs)</span>
           <span class="arch-box neutral">ChromaDB (vector embeddings)</span>
           <span class="arch-box neutral">Vault (markdown + PNG charts)</span>
         </div>
@@ -679,18 +678,19 @@
 
     <div class="feature-card">
       <span class="feature-icon">🏗️</span>
-      <h3>Schema-driven ORM (zero raw SQL)</h3>
-      <p>Pydantic <code>BaseModel</code> subclasses generate all DDL and DML from
-        field annotations — column names, types, nullability, defaults, and UNIQUE
-        constraints. No hardcoded SQL strings outside the model layer.</p>
+      <h3>Schema-driven models + migrations</h3>
+      <p>Pydantic <code>BaseModel</code> subclasses map every row and generate DML
+        (insert/upsert) and candidate DDL from field annotations — names, types,
+        nullability, defaults, UNIQUE constraints. Numbered migrations own the live
+        schema as the single source of truth.</p>
     </div>
 
     <div class="feature-card">
       <span class="feature-icon">🔒</span>
-      <h3>File-level write lock</h3>
-      <p>DuckDB is shared between Rust and Python. A <code>.lock</code> file held
-        for each write transaction prevents simultaneous writes without blocking
-        concurrent reads from either process.</p>
+      <h3>MVCC concurrency</h3>
+      <p>PostgreSQL is shared between Rust and Python. MVCC lets both processes read
+        and write concurrently — writers don't block readers and readers don't block
+        writers — with no file-level lock.</p>
     </div>
 
     <div class="feature-card">
@@ -713,9 +713,9 @@
     <div class="feature-card">
       <span class="feature-icon">📡</span>
       <h3>Multi-source data with TTL cache</h3>
-      <p>Prices, fundamentals, macro series, and SEC filings each have independent
+      <p>Prices, fundamentals, and SEC filings each have independent
         TTL policies (4 h → 7 d). Cache misses fetch live; hits return instantly
-        from DuckDB — no repeated API calls within a session.</p>
+        from PostgreSQL — no repeated API calls within a session.</p>
     </div>
 
     <div class="feature-card">
@@ -728,8 +728,8 @@
 
     <div class="feature-card">
       <span class="feature-icon">🤖</span>
-      <h3>MCP integration (21 tools)</h3>
-      <p>FastMCP server exposes 21 platform tools — generate analysis, manage the
+      <h3>MCP integration (17 tools)</h3>
+      <p>FastMCP server exposes 17 platform tools — generate analysis, manage the
         universe, refine screening criteria via a plain-English questionnaire,
         query the knowledge base, manage the watchlist, and trigger reports —
         callable from Claude Code chat via stdio transport.</p>
@@ -750,7 +750,7 @@
       <p>Structured multi-year financial statements pulled from
         <code>data.sec.gov/api/xbrl/companyfacts/</code> — no third-party data
         subscription required. CIK lookup, 10-K/10-Q text extraction, and 7-day
-        cache via DuckDB.</p>
+        cache via PostgreSQL.</p>
     </div>
 
     <div class="feature-card">
@@ -798,7 +798,7 @@
       <span class="metric-label">Python test coverage</span>
     </div>
     <div class="metric-card">
-      <span class="metric-value">614+</span>
+      <span class="metric-value">640+</span>
       <span class="metric-label">pytest tests</span>
     </div>
     <div class="metric-card">
@@ -817,33 +817,32 @@
 
   <p style="margin-top: 1.5rem;">
     Every module has a corresponding test file. Fixtures are shared via
-    <code>conftest.py</code>. External APIs (yfinance, FRED, Anthropic) are mocked
+    <code>conftest.py</code>. External APIs (yfinance, SEC EDGAR, Anthropic) are mocked
     at the boundary — no network calls in CI. Pydantic models enforce types at
     runtime; mypy enforces them statically. TypeScript is checked with
     <code>tsc --noEmit</code> and tested with Vitest (jsdom environment).
   </p>
 
-  <div class="code-block"><span class="code-comment"># Schema-driven DDL — no hardcoded SQL, generated from model_fields</span>
+  <div class="code-block"><span class="code-comment"># Row models map every table; create_ddl() generates DDL used to author migrations</span>
 <span class="code-keyword">class</span> <span class="code-type">MarketData</span>(TableModel):
-    ticker:     <span class="code-type">str</span>
-    data_type:  <span class="code-type">str</span>
+    ticker:     <span class="code-type">Annotated</span>[<span class="code-type">str</span>, <span class="code-type">ColumnMeta</span>(unique=<span class="code-keyword">True</span>)]
+    data_type:  <span class="code-type">Annotated</span>[<span class="code-type">str</span>, <span class="code-type">ColumnMeta</span>(unique=<span class="code-keyword">True</span>)]
     data:       <span class="code-type">dict</span>[<span class="code-type">str</span>, <span class="code-type">object</span>]
-    fetched_at: <span class="code-type">datetime</span>  = <span class="code-type">Field</span>(default_factory=datetime.utcnow,
-                                       json_schema_extra=<span class="code-type">DuckMeta</span>(default=<span class="code-string">"now()"</span>).as_extra())
-    _natural_key = (<span class="code-string">"ticker"</span>, <span class="code-string">"data_type"</span>)
+    fetched_at: <span class="code-type">Annotated</span>[<span class="code-type">datetime</span>, <span class="code-type">ColumnMeta</span>(default_sql=<span class="code-string">"now()"</span>)] = <span class="code-type">Field</span>(default_factory=datetime.now)
 
-<span class="code-comment"># Generates: CREATE TABLE IF NOT EXISTS market_data (</span>
+<span class="code-comment"># create_ddl() produces this DDL — the migrations own the live schema:</span>
+<span class="code-comment"># CREATE TABLE IF NOT EXISTS market_data (</span>
 <span class="code-comment">#   id UUID NOT NULL DEFAULT gen_random_uuid(),</span>
-<span class="code-comment">#   ticker VARCHAR NOT NULL,</span>
-<span class="code-comment">#   data_type VARCHAR NOT NULL,</span>
-<span class="code-comment">#   data JSON NOT NULL,</span>
-<span class="code-comment">#   fetched_at TIMESTAMP NOT NULL DEFAULT now(),</span>
+<span class="code-comment">#   ticker TEXT NOT NULL,</span>
+<span class="code-comment">#   data_type TEXT NOT NULL,</span>
+<span class="code-comment">#   data TEXT NOT NULL,</span>
+<span class="code-comment">#   fetched_at TIMESTAMPTZ NOT NULL DEFAULT now(),</span>
 <span class="code-comment">#   PRIMARY KEY (id), UNIQUE (ticker, data_type)</span>
 <span class="code-comment"># )</span></div>
 
   <p style="margin-top: 1.5rem;">
     CI pipeline: <strong>ruff</strong> (lint + format) → <strong>mypy</strong> (strict type check)
-    → <strong>pytest</strong> (614+ tests) → <strong>coverage</strong> upload to Codecov.
+    → <strong>pytest</strong> (640+ tests) → <strong>coverage</strong> upload to Codecov.
     All checks are required to pass before merge.
   </p>
 </section>
@@ -851,7 +850,7 @@
 
 <!-- ─── Footer ────────────────────────────────────────────────── -->
 <footer>
-  <p>Vantage &mdash; private project &mdash; built with Python 3.14 · Rust · TypeScript · Tauri 2 · DuckDB · Claude API</p>
+  <p>Vantage &mdash; private project &mdash; built with Python 3.14 · Rust · TypeScript · Tauri 2 · PostgreSQL · Claude API</p>
 </footer>
 
 </body>
