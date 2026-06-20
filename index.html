@@ -438,7 +438,6 @@
     <span class="badge">Tauri 2</span>
     <span class="badge">PostgreSQL</span>
     <span class="badge purple">Claude API</span>
-    <span class="badge">LlamaIndex</span>
     <span class="badge">FastAPI</span>
     <span class="badge">matplotlib</span>
     <span class="badge green">1,000+ tests</span>
@@ -472,9 +471,9 @@
         <h3>Python AI Microservice</h3>
       </div>
       <p>FastAPI server handling data ingestion from yfinance and the SEC EDGAR
-        XBRL API. RAG pipeline via LlamaIndex + ChromaDB. Thesis generation and
-        weekly report narrative via the Anthropic Claude API. MCP server with 17
-        tools for chat-based access.</p>
+        XBRL API. Filing-grounded structured qualitative workup and weekly report
+        narrative via the Anthropic Claude API. MCP server with tools for
+        chat-based access.</p>
     </div>
 
     <div class="stack-card">
@@ -512,12 +511,12 @@
     <div class="stack-card">
       <div class="stack-card-header">
         <div class="lang-dot python"></div>
-        <h3>RAG Knowledge Pipeline</h3>
+        <h3>Qualitative Workup Engine</h3>
       </div>
-      <p>Ingests domain documents (PDFs, markdown notes) into ChromaDB via
-        LlamaIndex. Local embeddings with <code>all-MiniLM-L6-v2</code> — no per-query
-        API cost. Incremental re-ingestion via mtime manifest. Cited passages injected
-        into Claude prompts.</p>
+      <p>A filing-grounded structured workup per shortlisted name — no retrieval.
+        Fetches the company's own 10-K (Item 1 / 1A / MD&amp;A), DEF 14A proxy, and
+        Form 4 insiders, then makes one structured-output Claude call. Typed result
+        carries the moat rubric (width &times; trend + source) and framework sections.</p>
     </div>
 
     <div class="stack-card">
@@ -642,7 +641,7 @@
           <span class="arch-box python">FastAPI (17 endpoints)</span>
           <span class="arch-box python">yfinance</span>
           <span class="arch-box python">SEC EDGAR</span>
-          <span class="arch-box python">LlamaIndex RAG</span>
+          <span class="arch-box python">Qualitative Workup</span>
           <span class="arch-box python">Claude API</span>
           <span class="arch-box python">matplotlib Charts</span>
           <span class="arch-box python">MCP Server (17 tools)</span>
@@ -657,7 +656,6 @@
         <span class="arch-label">Persistence</span>
         <div class="arch-boxes">
           <span class="arch-box neutral">PostgreSQL (market data, results, cache, logs)</span>
-          <span class="arch-box neutral">ChromaDB (vector embeddings)</span>
           <span class="arch-box neutral">Vault (markdown + PNG charts)</span>
         </div>
       </div>
@@ -695,10 +693,11 @@
 
     <div class="feature-card">
       <span class="feature-icon">🧠</span>
-      <h3>Cited RAG → structured prompts</h3>
-      <p>Domain PDFs and notes are chunked, embedded locally (no API cost), and
-        stored in ChromaDB. 3–5 targeted queries per analysis inject cited passages
-        directly into Claude prompts — grounding output in source material.</p>
+      <h3>Filing-grounded structured output</h3>
+      <p>The qualitative workup injects the company's own filings (10-K Item 1 / 1A /
+        MD&amp;A, DEF 14A, Form 4) into a single structured-output Claude call — a
+        typed moat rubric (width &times; trend + source) and framework sections,
+        grounded in source material with no retrieval.</p>
     </div>
 
     <div class="feature-card">
@@ -728,11 +727,10 @@
 
     <div class="feature-card">
       <span class="feature-icon">🤖</span>
-      <h3>MCP integration (17 tools)</h3>
-      <p>FastMCP server exposes 17 platform tools — generate analysis, manage the
-        universe, refine screening criteria via a plain-English questionnaire,
-        query the knowledge base, manage the watchlist, and trigger reports —
-        callable from Claude Code chat via stdio transport.</p>
+      <h3>MCP integration</h3>
+      <p>FastMCP server exposes the platform tools — generate the qualitative
+        workup, manage the universe and watchlist, fetch company snapshots, and
+        trigger reports — callable from Claude Code chat via stdio transport.</p>
     </div>
 
     <div class="feature-card">
