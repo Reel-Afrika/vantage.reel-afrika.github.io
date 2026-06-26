@@ -481,9 +481,11 @@
         <div class="lang-dot rust"></div>
         <h3>Rust Backend (Tauri)</h3>
       </div>
-      <p>Valuation engines (EPV, multiples, composite), quantitative screening
-        pipelines, PostgreSQL read/write via sqlx, tokio async runtime,
-        and a cron scheduler for automated batch runs.</p>
+      <p>The Tauri desktop backend: PostgreSQL read/write via sqlx, a tokio async
+        runtime, and a cron scheduler for automated batch runs. The valuation and
+        screening math (EPV, DCF, asset value, the valuation cross-check, and
+        recommendation synthesis) runs in a dedicated <code>vantage-compute</code>
+        Rust microservice behind an HTTP boundary.</p>
     </div>
 
     <div class="stack-card">
@@ -525,8 +527,8 @@
         <h3>Static Chart Generation</h3>
       </div>
       <p>matplotlib produces three PNGs per thesis at zero token cost: 5-year
-        revenue &amp; earnings bar chart (EDGAR XBRL), 1-year price vs 200d MA line
-        chart (yfinance), and valuation multiples vs 5-year historical average.
+        revenue &amp; earnings bar chart (EDGAR XBRL), 1-year price vs 50-day MA line
+        chart (yfinance), and valuation multiples vs their historical average.
         Images are embedded directly in Obsidian markdown.</p>
     </div>
 
@@ -560,8 +562,8 @@
     </div>
     <span class="funnel-arrow">→</span>
     <div class="funnel-step">
-      <span class="funnel-step-value">Screened</span>
-      <span class="funnel-step-label">All passing tickers<br/>scored &amp; ranked</span>
+      <span class="funnel-step-value">Ranked</span>
+      <span class="funnel-step-label">Quality-scored<br/>&amp; ranked</span>
     </div>
     <span class="funnel-arrow">→</span>
     <div class="funnel-step">
@@ -621,10 +623,11 @@
       <div class="arch-layer">
         <span class="arch-label">Rust Backend</span>
         <div class="arch-boxes">
-          <span class="arch-box rust">EPV Engine</span>
-          <span class="arch-box rust">Multiples Engine</span>
-          <span class="arch-box rust">Value Screener</span>
-          <span class="arch-box rust">Growth Screener</span>
+          <span class="arch-box rust">EPV / IV Engine</span>
+          <span class="arch-box rust">DCF + Asset Value</span>
+          <span class="arch-box rust">Valuation Cross-Check</span>
+          <span class="arch-box rust">Unified Screener</span>
+          <span class="arch-box rust">Recommendation</span>
           <span class="arch-box rust">Cron Scheduler</span>
           <span class="arch-box rust">PostgreSQL (sqlx)</span>
         </div>
@@ -637,13 +640,13 @@
       <div class="arch-layer">
         <span class="arch-label">Python Service</span>
         <div class="arch-boxes">
-          <span class="arch-box python">FastAPI (17 endpoints)</span>
+          <span class="arch-box python">FastAPI (30 endpoints)</span>
           <span class="arch-box python">yfinance</span>
           <span class="arch-box python">SEC EDGAR</span>
           <span class="arch-box python">Qualitative Workup</span>
           <span class="arch-box python">Claude API</span>
           <span class="arch-box python">matplotlib Charts</span>
-          <span class="arch-box python">MCP Server (17 tools)</span>
+          <span class="arch-box python">MCP Server (12 tools)</span>
         </div>
       </div>
 
@@ -736,7 +739,7 @@
       <span class="feature-icon">📅</span>
       <h3>Automated batch pipeline</h3>
       <p>tokio-cron-scheduler fires a weekly batch: Rust scheduler → Python data
-        fetch → Rust screening + valuation → Python candidate promotion → thesis
+        fetch → unified quality screen → EPV valuation + recommendation → thesis
         generation with embedded matplotlib charts → structured markdown report
         written to the Obsidian vault.</p>
     </div>
@@ -769,12 +772,13 @@
     </div>
 
     <div class="feature-card">
-      <span class="feature-icon">🎛️</span>
-      <h3>Guided criteria refinement</h3>
-      <p>MCP tools <code>refine_growth_criteria</code> and
-        <code>refine_value_criteria</code> ask 5 plain-English questions about risk
-        tolerance and investment preferences, then translate answers into updated
-        scoring rule weights — no JSON or finance jargon required.</p>
+      <span class="feature-icon">⚖️</span>
+      <h3>Margin-of-safety-led conviction</h3>
+      <p>Conviction is a book-grounded gated tier, not a weighted blend: the margin
+        of safety vs the conservative EPV intrinsic value sets the base (Graham), then
+        a contested valuation cross-check (EPV vs DCF / Asset / Multiples) or a
+        <code>none</code> moat can only lower it. Every name also carries its
+        EPV/DCF/Asset/Multiples second opinions and a historical valuation-band read.</p>
     </div>
 
   </div>
@@ -795,11 +799,11 @@
       <span class="metric-label">Python test coverage</span>
     </div>
     <div class="metric-card">
-      <span class="metric-value">640+</span>
+      <span class="metric-value">830+</span>
       <span class="metric-label">pytest tests</span>
     </div>
     <div class="metric-card">
-      <span class="metric-value">396</span>
+      <span class="metric-value">424</span>
       <span class="metric-label">TypeScript tests</span>
     </div>
     <div class="metric-card">
@@ -839,7 +843,7 @@
 
   <p style="margin-top: 1.5rem;">
     CI pipeline: <strong>ruff</strong> (lint + format) → <strong>mypy</strong> (strict type check)
-    → <strong>pytest</strong> (640+ tests) → <strong>coverage</strong> upload to Codecov.
+    → <strong>pytest</strong> (830+ tests) → <strong>coverage</strong> upload to Codecov.
     All checks are required to pass before merge.
   </p>
 </section>
